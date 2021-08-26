@@ -1,0 +1,91 @@
+
+server:
+  port: 4081
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 1000
+    min-spare-threads: 30
+    connection-timeout: 5000ms
+    servlet:
+      context-path: /
+    max-http-header-size: 81920
+
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+
+  application:
+    name: spring-cloud-gateway-simple
+
+  profiles:
+    active: dev
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # 开启服务注册与服务发现功能,通过serviceId转发到具体的服务实例
+          enabled: true
+          lower-case-service-id: true
+      routes:
+          id: service-customer
+          uri: lb://service-customer
+          #predicates: Path=/customer/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                status: 503
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+            # 使用StripPrefix在转发之前将/customer去掉 - StripPrefix=1
+
+        #- id: service-producer
+          #uri: lb://service-producer
+          #predicates: Path=/producer/**
+          #filters: StripPrefix=1
+
+        #- id: config-server
+          #uri: lb://config-server
+         #predicates: Path=/config/**
+          #filters: StripPrefix=1
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://192.168.1.6:8001/eureka
+
+# hystrix configuration
+hystrix:
+  metrics:
+    enabled: true
+    # 超时时间,默认2000ms
+    polling-interval-ms: 5000
+
+
+# security configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 120000 # 连接超时时间
+        readTimeout: 120000   # 读超时时间
+        loggerLevel: full # 日志级别
+
+
