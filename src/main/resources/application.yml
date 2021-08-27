@@ -30,9 +30,10 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-          id: service-customer
-          uri: lb://service-customer
-          #predicates: Path=/customer/**
+        - id: cg-template
+          uri: lb://cg-template
+          predicates:
+            - Path=/template/**
           filters:
             - name: Retry
               args:
@@ -42,11 +43,13 @@ spring:
               args:
                 name: fallbackcmd
                 fallbackUri: forward:/fallback
+                  - StripPrefix=1
             # 使用StripPrefix在转发之前将/customer去掉 - StripPrefix=1
 
-        #- id: service-producer
-          #uri: lb://service-producer
-          #predicates: Path=/producer/**
+        - id: cg-eureka-tob-client
+          uri: lb://cg-eureka-tob-client
+          predicates:
+            - Path=/tob-client/**
           #filters: StripPrefix=1
 
         #- id: config-server
