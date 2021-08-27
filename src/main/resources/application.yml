@@ -35,6 +35,7 @@ spring:
           predicates:
             - Path=/template/**
           filters:
+            - StripPrefix=1
             - name: Retry
               args:
                 retries: 3
@@ -43,14 +44,14 @@ spring:
               args:
                 name: fallbackcmd
                 fallbackUri: forward:/fallback
-                  - StripPrefix=1
             # 使用StripPrefix在转发之前将/customer去掉 - StripPrefix=1
 
         - id: cg-eureka-tob-client
           uri: lb://cg-eureka-tob-client
           predicates:
             - Path=/tob-client/**
-          #filters: StripPrefix=1
+          filters:
+            - StripPrefix=1
 
         #- id: config-server
           #uri: lb://config-server
