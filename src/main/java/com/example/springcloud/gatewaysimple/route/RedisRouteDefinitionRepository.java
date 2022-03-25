@@ -2,6 +2,7 @@ package com.example.springcloud.gatewaysimple.route;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Slf4j
 @Component
 public class RedisRouteDefinitionRepository implements RouteDefinitionRepository {
 
@@ -35,7 +37,8 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
     public Mono<Void> save(Mono<RouteDefinition> route) {
 
         return route.flatMap(routeDefinition -> {
-            redisTemplate.opsForHash().put(GATEWAY_ROUTE,routeDefinition.getId(),JSON.toJSON(routeDefinition));
+            log.info("routeDefinition:{}",routeDefinition);
+            redisTemplate.opsForHash().put(GATEWAY_ROUTE,routeDefinition.getId(),JSON.toJSONString(routeDefinition));
             return Mono.empty();
         });
     }
